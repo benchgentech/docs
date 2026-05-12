@@ -1,0 +1,138 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Mintlify Starter Kit",
+  "colors": {
+    "primary": "#16A34A",
+    "light": "#07C983",
+    "dark": "#15803D"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Documentation",
+          "href": "https://mintlify.com/docs",
+          "icon": "book-open-cover"
+        },
+        {
+          "anchor": "Blog",
+          "href": "https://mintlify.com/blog",
+          "icon": "newspaper"
+        }
+      ]
+    },
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting started",
+            "pages": [
+              "index",
+              "quickstart",
+              "development",
+              "connect-your-agent",
+              "run-your-first-benchmark"
+            ]
+          },
+          {
+            "group": "The Gym",
+            "pages": [
+              "environments-hub",
+              "agent-templates-and-starters",
+              "benchmarks-and-evals",
+              "trajectories-explorer",
+              "training-loops",
+              "sandboxes"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "what-is-a-digital-gym",
+              "environments-vs-benchmarks",
+              "trajectories-and-failure-modes",
+              "metrics-glossary"
+            ]
+          },
+          {
+            "group": "Integrations & Tools",
+            "pages": [
+              "sdk-reference",
+              "cli-reference",
+              "api-reference",
+              "webhooks-and-exports"
+            ]
+          },
+          {
+            "group": "Tutorials & Examples",
+            "pages": [
+              "e-commerce-checkout-agent",
+              "customer-support-agent",
+              "research-browser-agent",
+              "multi-tool-workflow-agent"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "scaling-benchmarks",
+              "custom-reward-functions",
+              "importing-production-traces",
+              "self-hosted-option"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              "pricing-and-limits",
+              "faq",
+              "troubleshooting",
+              "changelog",
+              "migration-guide",
+              "community-and-support"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:hi@mintlify.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://dashboard.mintlify.com"
+    }
+  },
+  "contextual": {
+    "options": [
+     "copy",
+     "view",
+     "chatgpt",
+     "claude",
+     "perplexity",
+     "mcp",
+     "cursor",
+     "vscode"
+   ]
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/mintlify",
+      "github": "https://github.com/mintlify",
+      "linkedin": "https://linkedin.com/company/mintlify"
+    }
+  }
+}
