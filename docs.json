@@ -38,6 +38,21 @@
             ]
           },
           {
+            "group": "Agentspace",
+            "pages": [
+              "welcome-to-agentspace",
+              "welcome-to-agentspace",
+              "agent-concepts",
+              "agent-concepts",
+              "creating-agents",
+              "creating-agents",
+              "agent-to-agent-integration",
+              "agent-to-agent-integration",
+              "connecting-custom-agents",
+              "connecting-custom-agents"
+            ]
+          },
+          {
             "group": "The Gym",
             "pages": [
               "environments-hub",
