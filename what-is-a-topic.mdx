@@ -1,0 +1,159 @@
+---
+title: "What Is a Topic?"
+---
+
+A Topic is a single, well‑bounded job your agent can perform. It groups: a clear name, a short classification description to catch the right user intents, a scope that sets boundaries, a list of atomic instructions that guide decisions, and the Actions (tools) allowed while the Topic is active. Keep Topics small, outcome‑focused, and non‑overlapping so the agent routes reliably.
+
+Below are the only five things you must get right—nothing extra.
+
+## **Parts of a Topic**
+
+A topic includes a [name](https://documentation.ubos.tech/docs/agentspace/topic-concepts#name), [classification description](https://documentation.ubos.tech/docs/agentspace/topic-concepts#classification-description), [scope](https://documentation.ubos.tech/docs/agentspace/topic-concepts#scope), [instructions](https://documentation.ubos.tech/docs/agentspace/topic-concepts#instructions), and [actions](https://documentation.ubos.tech/docs/agentspace/topic-concepts#actions).
+
+### **Name**
+
+Plain‑language job label (2–3 words) that a real user might naturally say.
+
+Do:
+
+- Pick the concrete outcome ("Subscription Upgrade", "Device Pairing").
+- Use words users will type—not internal acronyms.
+- Keep versions out unless making a breaking change later.
+
+Avoid:
+
+- Generic catch‑alls (Help, Info, GeneralSupport).
+- Stuffing multiple jobs ("Billing and Shipping and Returns").
+
+Fast test: If two different real user messages both match the whole meaning of the name but expect different result types, your name is too broad.
+
+**Example Topic Names**
+
+| **Less Effective** | **More Effective** |
+| :-- | :-- |
+| **Topic Name:** SupportTicket<br />**Why it's weak:** Too generic and includes technical terminology that provides no context about what specific support this topic handles. | **Topic Name:** Order Tracking<br />**Why it works:** Clearly describes the specific task using language customers naturally use when checking their shipments. |
+| **Topic Name:** DataManager<br />**Why it's weak:** Uses internal technical language and doesn't indicate what data management tasks users can actually request. | **Topic Name:** Export History<br />**Why it works:** Specifies the exact user outcome in plain language that matches how customers would naturally ask for this feature. |
+
+### **Classification Description**
+
+1–3 tight sentences (or one crisp line) listing the kinds of user requests that should trigger this Topic. Its job: maximize correct routing, not explain policy.
+
+Formula idea (example format line – adapt the placeholders to your domain): `Handle <problem / task keywords>: <phrase variant 1>, <phrase 2>, <phrase 3>; include <variation set>.` Use real verbs \+ objects users actually say (upgrade plan, connect device, resend activation). Skip internal codes and long storytelling.
+
+Checklist:
+
+- Mentions 3–6 concrete scenario phrases.
+- Includes common synonyms (upgrade / change plan, connect / pair device) if they materially differ.
+- Excludes execution steps (those belong in instructions) and hard rules (those belong in scope).
+
+**Example Classification Descriptions**
+
+| **Less Effective** | **More Effective** |
+| :-- | :-- |
+| **Description:** Handle product inquiries and stuff.<br />**Why it's weak:** Uses vague language and doesn't provide specific keywords or phrases that users actually say when making requests. | **Description:** Answer questions about product features: what does it do, how it works, compatibility requirements; include feature comparisons and specifications.<br />**Why it works:** Lists concrete scenarios with specific phrases users actually say, including common variations for product information requests. |
+| **Description:** Process customer data updates.<br />**Why it's weak:** Uses internal terminology and doesn't explain what types of customer requests should trigger this topic. | **Description:** Help customers update personal information: change email, update phone number, modify address; include profile picture changes.<br />**Why it works:** Clearly describes specific user requests using natural language customers would use, with concrete examples of update types. |
+
+### **Scope**
+
+Defines boundaries: what the agent is allowed to accomplish here and what it must decline or escalate. Without explicit negatives, models drift.
+
+Write it as four short lines (you can literally copy this pattern): Your job is to …\
+You can …\
+You must … (critical invariant)\
+You cannot … / Never …
+
+Guidance:
+
+- Start with the primary outcome: "enable a paid plan upgrade" or "complete first‑time Bluetooth pairing".
+- List only supporting tasks essential to success (e.g., confirm current plan, surface price delta).
+- Include at least one hard exclusion (e.g., cannot issue refunds, cannot alter hardware firmware, cannot change ownership).
+- If an exclusion triggers escalation, state it ("Escalate if user requests account deletion").
+
+**Example Scope Definitions**
+
+| **Less Effective** | **More Effective** |
+| :-- | :-- |
+| **Scope:** Manage customer accounts.<br />**Why it's weak:** Provides no specific guidance about capabilities, limitations, or expected behavior within the topic. | **Scope:** Your job is to help customers download their data export.<br />You can generate export files, check export status, and resend download links.<br />You must verify account ownership before starting any export.<br />You cannot modify what data gets exported or delete account data—escalate those requests.<br />**Why it works:** Uses the four-line pattern to clearly define allowed tasks, requirements, and explicit restrictions with escalation guidance. |
+| **Scope:** Handle shipping inquiries.<br />**Why it's weak:** Too broad and doesn't specify what aspects of shipping are included or excluded from this topic's responsibilities. | **Scope:** Your job is to provide real-time package tracking information.<br />You can look up tracking numbers, explain delivery status, and estimate arrival times.<br />You must confirm the tracking number format before performing lookups.<br />You cannot change delivery addresses or intercept packages—escalate shipping modifications.<br />**Why it works:** Clearly defines the specific task, allowed actions, required verification step, and explicit exclusions with escalation guidance. |
+
+### **Instructions**
+
+Atomic, imperative rules the model follows while the Topic is active. Each line = one decision aid. They clarify sequence, required info, branching, and when to ask vs act.
+
+Characteristics of a good instruction:
+
+- Starts with a verb (Ask / If / When / After / Always / Never / Use / Do not).
+- Refers to Actions by exact name when tool choice matters.
+- Contains a single conditional path; split if there are two "ifs".
+- Avoids vague nouns ("details", "stuff"); be concrete ("current plan name", "device model").
+
+Convert vague to precise:
+
+- Vague: "Get user info before upgrade."
+- Clear: "Before showing upgrade options, retrieve current plan via GetCurrentSubscription and confirm it matches the user's expectation."
+
+**Example Topic Instructions**
+
+| **Less Effective** | **More Effective** |
+| :-- | :-- |
+| **Instruction:** Check the customer's current status.<br />**Why it's weak:** Doesn't specify when, how, or what "status" means, leading to inconsistent execution across different scenarios. | **Instruction:** When a customer asks about their membership, use GetMembershipStatus to retrieve tier information and display current benefits before answering questions.<br />**Why it works:** Specifies the trigger condition, names the exact action to use, and details what information to present with clear timing. |
+| **Instruction:** Help customers with their questions.<br />**Why it's weak:** Lacks timing and method details, and doesn't clarify what constitutes appropriate help within this topic's scope. | **Instruction:** For questions about return eligibility, first ask for the order number and purchase date. Then use CheckReturnPolicy with those details to provide accurate return window information.<br />**Why it works:** Provides clear sequence, specifies required information collection, and names the exact action with required input approach. |
+| **Instruction:** Follow up when needed.<br />**Why it's weak:** Doesn't indicate when to follow up or provide context for generating appropriate follow-up questions. | **Instruction:** After completing a data export request, always ask if the customer needs help downloading the file or has questions about the export format.<br />**Why it works:** Defines the specific trigger point and provides guidance for contextually appropriate follow-up questions related to the topic's scope. |
+
+### **Actions**
+
+Actions are the only tools this Topic may call. Keep the list minimal—each should directly support a step in your instructions.
+
+Selection Rules:
+
+- Include only what appears in at least one instruction.
+- One Action per distinct external operation (fetch current plan, submit upgrade, start pairing). Avoid two Actions that return overlapping blobs if one can be refined.
+- Inputs must be simple, named clearly (plan\_id, device\_model). Avoid free‑form giant text inputs unless necessary.
+- Outputs should be structured so the agent can reference fields directly (status, price\_delta, capability\_list).
+
+Action Set Examples (conceptual): Subscription Upgrade: GetCurrentSubscription, ListUpgradeOptions, SubmitUpgradeOrder.\
+Device Pairing: FetchDeviceStatus, StartPairingAction, FetchDeviceCapabilities.
+
+Refinement Tip: If an Action is never called in logs for this Topic after launch, remove it or move it to the Topic where it actually belongs.
+
+**Example Action Definitions**
+
+| **Less Effective** | **More Effective** |
+| :-- | :-- |
+| **Action:** ProcessRequest<br />**Why it's weak:** Too generic and doesn't indicate what specific operation this action performs or what inputs it expects. | **Action:** GetOrderStatus<br />**Why it works:** Clear verb \+ object format that indicates exactly what operation is performed and what kind of data it retrieves. |
+| **Action:** UpdateData<br />**Why it's weak:** Vague about what data gets updated and doesn't specify the required inputs or expected outputs for reliable execution. | **Action:** UpdatePhoneNumber<br />**Why it works:** Specific operation with clear purpose, making it easy to understand when to use and what parameters are needed. |
+
+## **How Topics Work**
+
+When an agent receives a user request, it evaluates the input against all assigned topic names and classification descriptions. The agent then selects the most relevant topic based on the best match with the user's question and recent conversation context.
+
+Once a topic is selected, the agent uses the topic's scope to understand its boundaries, follows the instructions to determine the appropriate sequence of actions, and utilizes the available actions to complete the task or gather necessary information.
+
+### **Example Topic Implementation**
+
+Let's examine a Product Return topic to understand how each element guides agent behavior:
+
+**Topic Elements:**
+
+| **Element** | **Content** |
+| :-- | :-- |
+| **Name** | Product Return |
+| **Classification Description** | Help customers return items: start return, check return policy, get return label, refund status; include exchanges and damaged products. |
+| **Scope** | Your job is to help customers initiate returns for eligible products.<br />You can check return eligibility, generate return labels, and provide return instructions.<br />You must verify order details and product condition before processing returns.<br />You cannot approve returns outside policy window or process refunds directly—escalate those requests. |
+| **Instructions** | 1. Ask for order number and which item they want to return.<br />2. Use CheckReturnEligibility to verify the product qualifies for return within the time window.<br />3. If eligible, ask for reason (defective, wrong size, changed mind) and use GenerateReturnLabel.<br />4. Explain return process: "Pack the item securely, attach the return label, and drop it off at any carrier location."<br />5. After generating label, ask if they need help with exchanges or have other return questions. |
+| **Actions** | CheckReturnEligibility, GenerateReturnLabel, GetOrderDetails |
+
+This topic structure ensures consistent return processing while maintaining clear policy boundaries and providing step-by-step guidance for the agent.
+
+## **Best Practices**
+
+- Keep topics focused on single, specific outcomes
+- Ensure topic names and descriptions don't overlap with other assigned topics
+- Use explicit language in scope definitions to prevent capability drift
+- Write instructions that reference actions by their exact names
+- Monitor topic usage and refine based on actual conversation patterns
+- Start with minimal action sets and expand only when necessary
+
+---
+
+That's it. Ship small, observe, tighten. Add another Topic only when the next job has clearly different triggers or boundaries.

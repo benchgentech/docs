@@ -40,11 +40,31 @@
           {
             "group": "Agentspace",
             "pages": [
-              "welcome-to-agentspace",
-              "agent-concepts",
-              "creating-agents",
-              "agent-to-agent-integration",
-              "connecting-custom-agents"
+              {
+                "group": "Agents",
+                "pages": [
+                  "welcome-to-agentspace",
+                  "what-is-an-agent",
+                  "how-to-create-an-agent",
+                  "how-to-connect-custom-coder-agent",
+                  "agent-connections",
+                  "agent-to-agent-a2-a-connection"
+                ]
+              },
+              {
+                "group": "Topics",
+                "pages": [
+                  "what-is-a-topic",
+                  "how-to-create-a-topic"
+                ]
+              },
+              {
+                "group": "Actions",
+                "pages": [
+                  "what-is-an-action",
+                  "how-to-create-an-action"
+                ]
+              }
             ]
           },
           {

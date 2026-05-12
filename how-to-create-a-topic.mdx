@@ -1,0 +1,192 @@
+---
+title: "How to Create a Topic"
+---
+
+This step-by-step guide will help you add a new topic to one of your agents in Agentspace. Each step is illustrated with real screenshots for clarity.
+
+**What Is a Topic**
+
+A **Topic** represents a defined job, capability, or "problem space" your agent is authorized to handle end‑to‑end. Think of it as a focused mini playbook: it tells the agent **when** to engage (classification), **what** it's allowed to do (scope \+ actions), and **how** to behave (instructions \+ tone \+ guard rails). Collectively, all topics assigned to an agent = its skill set.
+
+Topics work together with **Actions**:
+
+- **Topic** = framed intent domain (Reservation Cancellation, Password Reset, Order Tracking…)
+- **Actions** = executable tools or procedures the agent can call inside that domain ("Retrieve reservation", "Check cancellation eligibility", "Send confirmation email")
+
+By carving work into clear topics you:
+
+- Improve intent routing accuracy (less confusion between similar requests)
+- Reduce hallucinations (the agent knows what's out‑of‑scope)
+- Simplify auditing & iteration (each topic is a contained artifact)
+- Enable reuse (drop a proven topic into another agent)
+
+> For deeper conceptual detail see: [What is a Topic](https://documentation.ubos.tech/docs/agentspace/topic-concepts)
+
+### **Core Parts of a Topic**
+
+| **Part** | **Purpose** | **Authoring Tips** |
+| :-- | :-- | :-- |
+| Name / Label | Human \+ API identifiers used in routing. | Plain, specific language a user might actually say. Distinct from other topic names. |
+| Classification Description | 1–3 sentences of trigger patterns (what user messages should map here). | Include concrete verbs / objects / variants users say. Avoid vague "handle general issues" phrasing. |
+| Scope | Explicit boundaries: what the topic does AND will not do. | "Your job is… You cannot… Never…" clarity prevents overreach. |
+| Instructions | Atomic behavioral rules guiding decisions & response style within this topic. | Make each testable; prefer "If/When… then…" patterns; avoid hidden business logic better enforced in an Action. |
+| Actions | Tooling the agent can execute while in this topic. | Only include actions genuinely needed; name them verb‑first and mirror wording in instructions for easier selection. |
+
+### **When to Create vs Reuse**
+
+Create a new Topic if:
+
+- The intent category isn’t covered without overloading an existing Topic’s scope.
+- The policy / decision rules differ materially (would require many conditional instructions otherwise).
+- Auditing or metrics need a separate lens (e.g., track cancellations separate from general booking changes).
+
+Reuse / extend an existing Topic if:
+
+- User phrasing & decision logic mostly overlap.
+- Only an additional Action or narrow instruction tweak is required.
+
+> Pro Tip: Write Scope & Instructions first in a scratch pad. If you struggle to stay concise, you probably have multiple topics tangled together.
+
+---
+
+## **How to Create a Topic**
+
+### **Create Your Own Topic**
+
+The creation flow below is collapsed into a single section so the right-side menu stays concise. Follow each numbered mini‑step in order.
+
+1. **Open My Agents & Select an Agent**\
+   Go to your Left Menu and click **My Agents**. Then click the agent you want to add a topic to (opens its details).\
+2. **Open the Topics Tab**\
+   In the agent’s left menu, click **Topics** to view existing topics.\
+3. **Click Create New Topic** This page also lists the existing topic in the Agent. On the Topics page, Before creating a topic, click **\+ Add Topic** to open the dropdown and select **\+ Create New Topic** to open the topic creation form.\
+   > Need AI assistance? See: [**Create with AI**](https://documentation.ubos.tech/docs/agentspace/how-to-create-topic#create-with-ai) below for prompt patterns and validation tips.
+4. **Fill Topic Details**\
+   Provide: Topic Label / API Name, Classification Description (when it should trigger), Scope (what it can & cannot do), Instructions (atomic behavioral rules), and add or select relevant Actions.
+   Example (Quiz Summaries)
+   | **Field** | **Example** | **Notes** |
+   | :-- | :-- | :-- |
+   | Topic Label | `Quiz Summaries` | Matches UI label exactly (spaces allowed). |
+   | Topic API Name | `quiz_summaries_1755694833371` | Auto‑generated unique name with numeric suffix. |
+   | Classification Description | A quiz helper and summarizer topic that reliably recognizes intents, binds recurring tasks, and executes safe, predictable workflows. | Copied verbatim from screenshot for accuracy. |
+   | Scope | This topic covers quiz design, generation of quiz questions, answering and scoring support, summarization of articles or materials, intent classification, action orchestration, recurring task management, prompt design, and safety boundaries to ensure accurate, predictable, and safe responses. | Broad example scope from screenshot (would normally be narrowed). |
+   | Instructions | 1. If no quiz reference provided, ask for quiz ID or name before summarizing.<br />2. Always include overall score (percentage \+ fraction).<br />3. Highlight top 1 strength and 1 improvement area only.<br />4. Add a single actionable next step (e.g., suggested topic to review).<br />5. Do not fabricate missing metrics—ask instead. | Supplementary—refine after initial save. |
+5. **Save the Topic**\
+   Review each required field. When satisfied, click **Save Changes** to persist.
+6. **Test the Topic**\
+   Open the right‑side Chat panel. Enter user phrases that should trigger this Topic (e.g., "Summarize my quiz", "Score overview please"). Try an out‑of‑scope prompt (e.g., "Create 10 new purchase") the Topic should NOT handle it; if it does, narrow the Classification Description or Scope. Repeat until routing and output look correct.
+
+---
+
+### **Create with AI**
+
+Prefer to start from a structured draft? Use the AI generator to scaffold a Topic, then harden it manually.
+
+1. **Open Topic Creation**\
+   Go to your Agent → **Topics** → **Add Topic** → choose **Generate with AI** from the dropdown menu.\
+2. **Write a High-Signal Prompt**\
+   Enter a brief description of what you want the Topic to handle, e.g., "Manage customer inquiries and provide product recommendations."\
+   Describe: goal, key behaviors, defaults, exclusions, sensitive boundaries, and required actions (if known).\
+   | **Use Case** | **Prompt Example** | **Highlights** |
+   | :-- | :-- | :-- |
+   | Plan Upgrade | Create a topic to upgrade a user's subscription plan. List feature differences, compute prorated cost, confirm consent before executing. Exclude downgrades. | Defaults \+ exclusions \+ consent |
+   | Quiz Summary | Topic that summarizes completed quizzes: show score %, 1 strength, 1 improvement tip, and next study suggestion. If quiz ID missing, ask for it first. | Structured outputs \+ required clarifier |
+   | Order Tracking | Provide shipment status, delivery ETA, and carrier info. If missing order number, ask for email \+ last 4 of order ID. Exclude returns (Returns topic). | Input fallback \+ scope boundary |
+3. **Submit & Review Draft**\
+   Based on your description, the system generates key fields: Topic Label, API Name, Classification Description, Scope, and initial Instructions. Review for clarity, overlap with existing Topics, and safety boundaries. Adjust wording or split into another Topic if scope feels too broad.\
+
+### **Use a Topic Template**
+
+Leverage a pre-built template when your use case is common (tracking, FAQ, quiz, summary) and you want speed \+ consistency. Templates provide proven structures for frequent scenarios, allowing you to skip the foundational setup and focus on customization.
+
+1. **Access the Asset Library**\
+   Go to your Agent → **Topics** → **Add Topic** → choose **Add from Asset Library** from the dropdown menu. This opens the template library where you can browse pre-built topic structures.\
+2. **Browse and Search Templates**\
+   Search or filter by keyword (quiz, order, support, summary, FAQ, cancellation) to find relevant templates. Each template shows a preview of its structure and intended use case.\
+3. **Preview Template Details**\
+   Before selecting, review the template's Label, Classification Description, Scope boundaries, and Instructions list to ensure it matches your needs.
+4. **Select and Apply Template**\
+   Click **Use Template** to apply the selected template to your agent. This imports the template structure with placeholder content.
+5. **Customize Template Details**\
+   Modify the template to fit your specific requirements. Focus ONLY on what needs adjustment:
+   - Ensure unique API name (no collisions with existing topics)
+   - Remove irrelevant instructions
+   - Add missing exclusions ("You cannot …")
+   - Insert compliance / safety rules (PII, refunds, etc.)
+   - Adjust actions to just what's required
+   - Update classification triggers to match your exact use case\
+     \
+     When satisfied with your customizations, click **Save** to persist the topic.y-step guide will help you add a new topic to one of your agents in Agentspace. Each step is illustrated with real screenshots for clarity.
+6. **Test and Validate the Topic**\
+   After saving, thoroughly test the topic to ensure proper routing and behavior.
+
+**Testing Your Topic**
+
+**Positive Triggers (Should activate this topic):** Test 3-5 phrases that should route to this topic. For example, if using a "Quiz Summary" template:
+
+- "Can you summarize my last quiz?"
+- "Show me my quiz results"
+- "I need a summary of my quiz performance"
+- "What was my score on the recent quiz?"
+
+**Negative Triggers (Should NOT activate this topic):** Test 2-3 phrases that should route elsewhere or be rejected:
+
+- "Create a new quiz for me" (should go to Quiz Creation topic)
+- "Delete my quiz history" (should go to Data Management topic)
+- "How do I contact support?" (should go to General Support topic)
+
+**What to Check:**
+
+- Classification accuracy: Does it correctly identify when to engage?
+- Scope boundaries: Does it stay within defined limits?
+- Instruction adherence: Does it follow the behavioral rules?
+- Action availability: Can it access the required tools?
+- Response quality: Are outputs helpful and consistent?
+
+**If routing fails:** Adjust the Classification Description to be more specific or add exclusions to the Scope.
+
+**Final Steps:**
+
+1. Check naming collisions (ensure API uniqueness across all topics).
+2. Add or map required Actions; remove unused ones.
+3. Adjust classification wording until routing is stable and predictable.
+
+---
+
+## **Writing Good Topic Definitions**
+
+Design Topics so they are focused, reusable, and auditable. A strong definition includes:
+
+- Topic Label (human readable; PascalCase or snake\_case)
+- API Name (unique; lowercase \+ digits \+ underscores)
+- Classification Description (natural language triggers / when to route)
+- Scope (what it does AND what it does not do)
+- Instructions (atomic, testable behavioral rules)
+
+Below are two additional examples to illustrate variety in domains.
+
+### **Example 1: Subscription Upgrade (SaaS Billing Agent)**
+
+| **Field** | **Example** |
+| :-- | :-- |
+| Topic Label | `Subscription_Upgrade` |
+| Topic API Name | `subscription_upgrade` |
+| Classification Description | Handle user requests to upgrade plan/tier: "Upgrade me to Pro", "Add more seats", "Increase storage", "Move from Starter to Enterprise". |
+| Scope | Your job: present eligible upgrade paths, validate account status, calculate prorated cost, and submit upgrade. You cannot downgrade (Downgrade topic) or adjust invoices manually. Never promise discounts outside configured promotions. |
+| Instructions | 1. If current plan unknown, retrieve account plan first.<br />2. Always list key feature diffs before confirming upgrade.<br />3. Provide prorated cost breakdown if mid‑cycle.<br />4. Confirm explicit consent ("Yes, upgrade") before executing.<br />5. After success, summarize new plan, next billing date, and added features. |
+| Actions (sample) | Get Account Plan; List Upgrade Options; Calculate Prorated Amount; Execute Plan Change |
+
+### **Example 2: Hardware Troubleshooting (Support Agent)**
+
+| **Field** | **Example** |
+| :-- | :-- |
+| Topic Label | `Hardware_Troubleshooting` |
+| Topic API Name | `hardware_troubleshooting` |
+| Classification Description | Assist with device not powering on, overheating, abnormal noise, connectivity or peripheral issues: "Laptop won't start", "Fan too loud", "USB not recognized". |
+| Scope | Your job: gather device model & symptoms, guide through safe diagnostic steps, and determine if escalation/RMA is required. You cannot provide electrical repair advice or bypass safety protocols. Never instruct opening sealed components. |
+| Instructions | 1. Always collect model \+ OS \+ symptom summary before suggesting fixes.<br />2. Prioritize non‑intrusive steps (power cycle, peripheral isolation) before advanced diagnostics.<br />3. If burning smell or smoke mentioned, stop troubleshooting and escalate immediately.<br />4. Offer a maximum of 3 troubleshooting steps per response; then ask for result.<br />5. If two consecutive steps fail, propose escalation/RMA evaluation. |
+| Actions (sample) | Get Device Details; Run Diagnostic Script; Create Escalation Ticket; Initiate RMA Check |
+
+---
+
+Congratulations! You've created a new topic for your agent. Repeat these steps to add more topics or refine existing ones.

@@ -1,0 +1,153 @@
+---
+title: "How to Create an Action"
+---
+
+This step‑by‑step guide shows how to add a new Action to one of your Topics. Format, tone, and structure mirror the Topic guide for consistency.
+
+---
+
+**What Is an Action**
+
+An **Action** is the executable capability a Topic can invoke to move from intent → real outcome. Where a Topic defines scope, guardrails, and behavioral rules, an Action is the concrete tool (API call, workflow, computation, retrieval, mutation) that actually does work.
+
+Multiple Topics can reuse the same Action (e.g., a generic customer lookup). Likewise a single Topic may orchestrate several Actions in sequence. Designing Actions as modular, well‑named, side‑effect‑clear units keeps agents predictable, debuggable, and auditable.
+
+> For deeper conceptual detail see: [What is an Action](https://documentation.ubos.tech/docs/agentspace/what-is-an-action)
+
+### **When to Create vs Reuse**
+
+Create a new Action if:
+
+- Side effects or API contract differ (new endpoint, new verb, different auth).
+- Required inputs / outputs diverge meaningfully from existing ones.
+- You need isolated monitoring or rollout control.
+
+Reuse (or lightly extend) an existing Action if:
+
+- Only the calling Topic logic changes, not the underlying operation.
+- A minor additional optional field covers the delta.
+
+> Tip: If you find yourself adding conditional branching inside an Action description (“Sometimes updates, sometimes queries …”), you probably have multiple Actions intertwined—split them.
+
+---
+
+## **How to Create an Action**
+
+1. **Open My Agents & Select an Agent**\
+   Go to your Left Menu and click **My Agents**. Then click the agent you want to add a topic to (opens its details).\
+2. **Open the Topics Tab**\
+   In the agent’s left menu, click **Topics** to view existing Topics.
+3. **Open the Topic’s Actions**\
+   Click the Topic name, then open **This Topic’s Actions** to see any attached Actions.\
+4. **Create a New Action**\
+   This page lists the Actions attached to the selected Topic. To add an Action: click **\+ Add Action** then click the **\+ Create a New Action** and proceed to configure the Action.
+
+### **Create Your Own API Action**
+
+5. **Fill Action Details**\
+   Select **API** action and click to **Continue to Configure** complete fields in each block: Basic Info, Endpoint Configuration, Authentication, Query Params, Custom Headers, Input Parameters, Output Schema, Advanced Settings. Keep labels short and outputs lean.\
+   Example (Get Product Details)
+   | **Field** | **Example** | **Notes** |
+   | :-- | :-- | :-- |
+   | Label | `Get Product Details` | Clear verb \+ object. |
+   | Description | Call external API endpoints | Refine later with disambiguator (e.g., "Returns name, price, availability"). |
+   | Base URL | `https://external-agent-.../testenvcloudlabs.cn` | Version / environment explicit. |
+   | HTTP Method | `POST` | Matches service contract (use GET if retrieval only). |
+   | Endpoint Path | `/getproduct` | No trailing slash duplication. |
+   | Authentication | No Authentication (example) | Replace with real auth when secured. |
+   | Query Parameters | (none) | Add only if filtering needed. |
+   | Custom Headers | (none) | Insert `Accept: application/json` etc. if required. |
+   | Input Parameters | `productId` (string, required) | Single required key. |
+   | Output Schema | `productDetails` (string) | Replace with structured fields when mapping added. |
+   | Timeout | `30` seconds | Tune to API latency. |
+   | Retries | `0` | Increase only for idempotent calls. |
+   | Error Handling | Throw Error | Fail fast for visibility. |
+   | Response Mapping | (empty) | Add transform once response shape confirmed. |
+6. **Test the API Action**\
+   Click **Test API**. Check assembled URL, method, headers, body, status code, and mapped outputs. Iterate until: correct status, expected latency, outputs populated, no secrets leaked.\
+   \
+7. **Save the API Action**\
+   When satisfied, press **Save**.\
+8. **Validate in Chat**\
+   Use the right‑side chat. Trigger phrases that _should_ invoke the Action plus a phrase that should route elsewhere. Adjust Description if mis‑selected.
+
+---
+
+### **Use an Action Template**
+
+Leverage a pre-built template when your operation is common (lookup, list, status check) and you want speed \+ consistency. Templates provide proven structures so you can skip boilerplate and safely focus on the essentials.
+
+1. **Access the Asset Library**\
+   Go to your Agent → **Topics** → open the relevant Topic → **This Topic’s Actions** → click **Add from Asset Library**. This opens the action template library where you can browse reusable API actions.\
+2. **Browse and Search Templates**\
+   Search or filter by keyword (product, order, quiz, invoice) to find relevant templates.
+3. **Preview Template Details**\
+   Review the template’s Label, Description, Inputs, Outputs, HTTP Method, Base URL/Path, Authentication, and Headers to ensure it matches your needs.
+4. **Select and Apply Template**\
+   Click one **Template** to clone the action into your Topic.
+5. **Customize Template Details**\
+   Modify ONLY what’s required:
+   - Ensure a unique label / API name (avoid collisions)
+   - Update auth to your secret reference
+   - Adjust Base URL / path placeholders
+   - Remove unused params & outputs
+   - Narrow the description (state one clear purpose)
+   - Provide Example Input JSON if absent
+   - Validate timeouts/retries for your API
+6. **Test and Validate the Action**\
+   Click **Test API** to verify assembled URL, method, headers, body, status code, and mapped outputs. Then **Save** and validate in chat to confirm the agent calls the correct action.
+
+**Testing Your Action**
+
+**Positive Triggers (Should use this action):** Test 3–5 phrases that should cause the agent to select this action. For example, if using a “Product Details” action:
+
+- "Get product details for 12345"
+- "Show me the price of product 12345"
+- "Is product 12345 in stock?"
+
+**Negative Triggers (Should NOT use this action):** Test 2–3 phrases that should route elsewhere or not call this action:
+
+- "Update the price for product 12345" (update action)
+- "List all products under \$20" (search/list action)
+
+**What to Check:**
+
+- Correct action selection and API invocation
+- URL, method, headers, auth, and request body correctness
+- Response mapping populates expected outputs and types
+- Latency within acceptable bounds; no secrets in logs
+
+**If selection fails:** Narrow the action description, adjust inputs/outputs, or refine Topic instructions so the agent prefers this tool for the intended phrasing.
+
+**Final Steps:**
+
+1. Confirm unique API name and label.
+2. Re‑test with 3 positive and 2 negative phrases.
+3. Save changes once outputs look correct.
+
+---
+
+## **Writing Good Action Definitions**
+
+Strong Actions are: _focused_, _predictable_, _reusable_. A good description is the most critical part of an Action's definition. It tells the agent _when_ and _how_ to use the tool. Be specific about side effects, required inputs, and expected outputs.
+
+**Description Examples**
+
+A vague description leads to unpredictable agent behavior. A specific, detailed description ensures the right tool is used for the right job.
+
+| **Vague (Weak)** | **Specific (Improved)** |
+| :-- | :-- |
+| `Update phone number.` | `Updates the phone number for an existing contact. If no contact matches the email, a new one is created.` |
+| `Get tracking info.` | Returns the carrier, latest status, and ETA for a shipment using `tracking_number` and `destination_postal_code`. |
+
+**Parameter Guidance Examples**
+
+| **Parameter** | **Description** |
+| :-- | :-- |
+| `productId` | Unique product identifier string; required. |
+| `product_price` | Numeric price amount from `response.price.amount`. |
+| `in_stock` | Boolean; `true` if `response.stock > 0`. |
+
+---
+
+**Done!** You’ve created (or templated) an Action and hardened its definition.

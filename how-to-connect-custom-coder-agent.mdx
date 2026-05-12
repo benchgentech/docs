@@ -1,0 +1,154 @@
+---
+title: "How to Connect Custom Coder Agent"
+---
+
+This comprehensive guide shows you how to connect and use your custom coder agent from UBOS Agentspace directly in VS Code using the Cline extension. This integration allows you to leverage your custom AI agent for coding assistance, debugging, and development tasks directly in your IDE.
+
+---
+
+## **Overview**
+
+The Custom Coder Agent integration enables you to:
+
+- Access your UBOS Agentspace custom agents directly from VS Code
+- Use specialized coding agents with custom knowledge and capabilities
+- Leverage your agent's custom actions and topics for development tasks
+- Maintain context and conversation history across coding sessions
+
+**Prerequisites**
+
+Before you begin, ensure you have:
+
+- An active UBOS Agentspace account
+- A custom coder agent created in your Agentspace (see [How to Create an Agent](https://documentation.ubos.tech/docs/agentspace/how-to-create-agent))
+- VS Code installed on your system
+- The Cline extension installed in VS Code
+
+---
+
+## **Step 1: Access Your Custom Agent in Agentspace**
+
+1. **Sign in to UBOS Agentspace**\
+   First, sign in to your UBOS Agentspace platform using your credentials.
+2. **Navigate to My Agents**\
+   In your UBOS Agentspace dashboard, click on **My Agents** from the left sidebar to view all your available agents.
+3. **Locate Your Coder Agent**\
+   Find your custom coder agent in the agents list. You can identify it by the name and description you provided during creation.
+4. **Access Agent Advanced Settings**\
+   Click on your agent to open its details page, then navigate to the **Advanced** tab in the left sidebar.
+
+---
+
+## **Step 2: Configure Custom LLM Model**
+
+In the Advanced settings, you'll see the **Custom LLM Model Management** section with important connection details:
+
+### **Model Configuration Details**
+
+The system will display your agent's connection information:
+
+- **Model Running Status**: Indicates if your model is active
+- **LiteLLM URL**: The endpoint URL for your agent (e.g., `https://litellm-1819-68a7d218026d9811000012e.agentspaceuat.ubos.tech/`)
+- **Token**: Your authentication token (displayed as `sk-x`)
+- **Model Name**: Your agent's identifier (e.g., `qwen3-coder-dt`)
+
+**Important Notes**
+
+- Keep your token secure and never share it publicly
+- The LiteLLM URL is unique to your agent and workspace
+- Your model must be in "Running" status to accept connections
+
+---
+
+## **Step 3: Install and Configure Cline Extension**
+
+### **Install Cline Extension**
+
+1. **Open VS Code Extensions**\
+   Launch VS Code and click on the Extensions icon in the left sidebar (or press `Ctrl+Shift+X`).
+2. **Search for Cline**\
+   In the extensions marketplace, search for "Cline" and install the extension.
+3. **Verify Installation**\
+   After installation, you should see the Cline icon in your VS Code sidebar.
+
+### **Configure Cline with Your Custom Agent**
+
+1. **Open Cline Settings**\
+   Click on the Cline extension icon, then click on the settings/configuration button.
+2. **Select API Provider**\
+   Choose "OpenAI Compatible API Key" as your provider type.
+3. **Enter Configuration Details**\
+   Fill in the following information from your Agentspace Advanced settings:
+   | **Field** | **Value** | **Example** |
+   | :-- | :-- | :-- |
+   | **Base URL** | Your LiteLLM URL from Agentspace | `https://litellm-1819-68a7d218026d9811000012e.agentspaceuat.ubos.tech/` |
+   | **API Key** | Your token from Agentspace | `sk-x` (use your actual token) |
+   | **Model ID** | Your model name | `qwen3-coder-dt` |
+   | **Context Window Size** | Set according to your model's capabilities | `65000` (for qwen3-coder-dt) |
+4. **Configure Advanced Options** (Optional)\
+   You can adjust additional settings such as:
+   - **Temperature**: Controls response creativity (0.0 - 1.0)
+   - **Max Output Tokens**: Maximum response length
+
+---
+
+## **Step 4: Test Your Connection**
+
+### **Verify Connection**
+
+1. **Start a New Chat**\
+   Open Cline and start a new conversation to test the connection.
+2. **Send a Test Message**\
+   Try a coding-related query like the one shown in the screenshot:
+   ```text
+   Can you create me a good tech company landing page?
+   ```
+3. **Verify Response**\
+   Your custom agent should respond according to its configured personality and capabilities, potentially offering to create HTML, CSS, and JavaScript files for a modern landing page.
+
+### **Test Agent Capabilities**
+
+Test various aspects of your custom agent with practical requests:
+
+- **Web Development**: Ask it to create landing pages, components, or web applications
+- **Code Generation**: Request specific functions, classes, or complete file structures
+- **Code Review**: Have it analyze existing code in your workspace
+- **Project Setup**: Ask for help setting up new projects or frameworks
+- **Debugging**: Request help with error messages or issues
+
+### **Example Test Queries**
+
+Try these example queries to test different capabilities:
+
+```text
+Can you help me create a responsive navigation bar for my website?
+```
+
+```text
+Build a REST API with authentication using Node.js and Express
+```
+
+```text
+Create a React component for a product card with hover effects
+```
+
+---
+
+## **Troubleshooting**
+
+### **Common Issues and Solutions**
+
+| **Issue** | **Possible Cause** | **Solution** |
+| :-- | :-- | :-- |
+| **Connection & Auth Failed** | Incorrect URL or token | Verify your LiteLLM URL and token in Agentspace Advanced settings |
+| **Model Not Responding** | Agent is stopped | Check that your agent status shows "Running" in Agentspace |
+| **Slow Responses** | Network or model load | Check your internet connection and agent status |
+| **Unexpected Responses** | Wrong model configuration | Verify the model ID matches your agent name |
+
+### **Getting Help**
+
+If you encounter issues:
+
+1. **Check Agent Status**: Ensure your agent is running in Agentspace
+2. **Verify Configuration**: Double-check all connection details
+3. **Review Logs**: Check VS Code's output panel for error messages

@@ -1,0 +1,171 @@
+---
+title: "What Is an Action?"
+---
+
+An Action is a single, well‑bounded operation your agent can perform while a Topic is active. Where a Topic answers “Should I engage and how do I behave?”, an Action answers “Do this concrete thing now.” Fetch data, update a record, start a workflow, call an external API—each of those should be its own Action.
+
+Keep Actions small, deterministic, and composable. If two user requests would require different side effects or different inputs/outputs, you likely need two separate Actions.
+
+## **Parts of an Action**
+
+An Action includes a [name](https://documentation.ubos.tech/docs/agentspace/what-is-an-action#name), [when to use (description)](https://documentation.ubos.tech/docs/agentspace/what-is-an-action#when-to-use-description), [inputs](https://documentation.ubos.tech/docs/agentspace/what-is-an-action#inputs), [outputs & mapping](https://documentation.ubos.tech/docs/agentspace/what-is-an-action#outputs--mapping).
+
+### **Name**
+
+Short verb \+ object (GetOrderStatus, DraftEmailReply, CreateTicket). Must be distinct from other Actions.
+
+Do:
+
+- Use varied leading verbs (Get, List, Find, Create, Update, Draft, Summarize).
+- Reflect the real outcome (“Get Product Details” not “Call API”).
+- Keep it singular and atomic—one job only.
+
+Avoid:
+
+- Generic buckets (ProcessRequest, HandleData, ExecuteAction).
+- Stuffing multiple jobs (LookupOrCreateOrUpdateUser).
+- Including transport details (…ViaGraphQL, …FromServiceX) unless versioning/transport is the actual user‑visible contract.
+
+**Examples**
+
+| **Less Effective** | **More Effective** |
+| :-- | :-- |
+| `ProcessCustomerData` | `UpdatePhoneNumber` |
+| `ManageOrders` | `GetOrderStatus` |
+| `EmailHandler` | `DraftEmailReply` |
+
+Fast test: If two unrelated user requests still “fit” the name, it’s too broad.
+
+### **When to Use (Description)**
+
+One crisp sentence (two max) saying outcome \+ required key input \+ a disambiguator.
+
+Pattern idea: Return name, price, availability for a product using product\_id; exclude archived products.
+
+Weak vs Strong:
+
+- Weak: “Updates a phone number.”
+- Strong: “Update the phone number on an existing contact; create a new contact only if email has no match.”
+
+Tips:
+
+- Mention 1–2 common trigger phrases only if routing collisions persist.
+- Cut boilerplate (“This action allows the system to…”).
+
+#### **Examples: Less vs More Effective Descriptions**
+
+| **Action** | **Less Effective** | **More Effective** |
+| :-- | :-- | :-- |
+| ChangeProfilePhone | Changes a phone number. | Replace the phone on an existing user profile identified by user\_id; if the profile doesn’t exist but email is provided, create the profile before updating the phone. |
+| SyncCalendarEvent | Syncs calendar event. | Create or update a calendar event using external\_event\_id and calendar\_id; skip invites for archived calendars and return the normalized event payload. |
+| FindInventoryItems | Searches inventory. | Locate in‑stock SKUs by keyword and warehouse\_id; exclude discontinued items and limit results to the caller’s organization. |
+
+#### **Optional: Trigger Utterances**
+
+Include 1–3 short examples of user messages that should select this Action. Vary phrasing and length; avoid overlapping with other actions.
+
+- “Show my meetings next Tuesday.”
+- “Do we have medium blue jackets in stock?”
+- “Send the welcome message to the new teammate.”
+- “Pull the latest status for order AB-1042.”
+
+### **Inputs**
+
+Explicit list of parameters the Action expects.
+
+Guidelines:
+
+- Mark required vs optional; fail fast if a required one is missing.
+- Specify type and format (ISO 8601 date, lowercase id, 2‑letter country code).
+- Keep names simple (product\_id, locale, max\_results).
+- Avoid giant free‑form blobs unless absolutely necessary.
+- Validate early; don’t silently coerce types.
+
+Common patterns:
+
+- Identity: user\_id, account\_id (scopes requests to the right tenant).
+- Pagination: page, page\_size or cursor, limit (set sane caps).
+- Filtering: from\_date, to\_date, status (document allowed values).
+
+#### **Input Parameter Instruction Examples**
+
+| **Parameter** | **Instructions** |
+| :-- | :-- |
+| resource\_id | The unique identifier of the target entity. Accept `res_********` format; reject if missing or malformed. |
+| entity\_kind | The canonical type of the target (for example: user, order, product). Infer from context if omitted; prefer explicit input when available. |
+| locale | BCP‑47 language tag used for formatting (for example: en-US). Default is `en-US` when not provided. |
+| date\_range | An object with `from` and `to` ISO‑8601 dates; clamp to a maximum of 90 days and fail if `from > to`. |
+
+#### **Dependent Actions & Ordering (Optional)**
+
+When an Action relies on another Action to produce a required input, state the ordering rule explicitly using exact action names.
+
+- If present in the plan, Run `ResolveUserIdByEmail` immediately before `SendWelcomeMessage` to provide `user_id`.
+- When both are needed, Run `ResolveSkuByName` before `FindInventoryItems` to provide a single `sku_id`.
+
+### **Outputs & Mapping**
+
+Return only the fields the agent (or next Action) genuinely needs. Normalize raw payloads to stable, snake\_case values.
+
+Checklist:
+
+- 3–6 purposeful fields beat dumping raw JSON.
+- Convert types (string numbers → numbers, null booleans → false).
+- Provide defaults or fail clearly if a critical field is missing.
+- Avoid leaking secrets or verbose internal traces.
+
+Weak vs Strong mapping:
+
+- Weak: entire raw response forwarded.
+- Strong: `{ product_name, product_price, in_stock }` extracted and typed.
+
+Example mapping:
+
+- Raw: `{ "name": "Widget Pro", "price": "199.00", "availability": "in_stock" }`
+- Mapped: `{ product_name: "Widget Pro", product_price: 199.0, in_stock: true }`
+
+#### **Output Parameter Instruction Examples**
+
+| **Output** | **Instructions** |
+| :-- | :-- |
+| summary | A concise HTML snippet suitable for rendering in the UI; must not contain scripts or inline event handlers. |
+| matches | An array of IDs ordered by relevance; include at most 25 items. |
+| email\_draft | JSON with `to_id`, `subject`, and `body_md`. Use Markdown in `body_md`; do not embed images. |
+
+---
+
+## **How Actions Work**
+
+Topics decide intent and sequence; Actions do the work. When a Topic is active, the agent chooses among allowed Actions, passes validated inputs, and consumes normalized outputs. Good Actions are:
+
+- Deterministic: same inputs → same outputs.
+- Composable: outputs feed cleanly into next steps.
+- Observable: failures are typed and explain what to do next (ask user for missing input, retry later, escalate).
+
+### **Example Action Definition**
+
+Let’s define a precise “GetOrderStatus” Action to show the full contract.
+
+| **Element** | **Content** |
+| :-- | :-- |
+| **Name** | GetOrderStatus |
+| **When to Use** | Retrieve the latest status, carrier, and ETA for an order using order\_id; limited to the caller’s account. |
+| **Inputs** | `order_id` (required, string, format: `ord_XXXXXXXX`), `account_id` (required, string), `locale` (optional, default `en-US`) |
+| **Outputs** | `status` (one of: processing, shipped, delivered, canceled), `carrier` (string), `tracking_number` (string\|null), `eta_date` (ISO date\|null) |
+
+Strong mapping example:
+
+- Raw upstream: `{ "order": { "state": "IN_TRANSIT", "eta": "2025-08-30", "carrier": "DHL", "track": "ABC123" } }`
+- Mapped output: `{ status: "shipped", carrier: "DHL", tracking_number: "ABC123", eta_date: "2025-08-30" }`
+
+### **When to Create vs Reuse**
+
+Create a new Action if side effects, inputs, or outputs differ materially or you’d need branching (“if / else”) in the description. Reuse (or lightly extend) if only a minor optional parameter changes.
+
+### **Common Pitfalls**
+
+- Ambiguous description → mis‑routing.
+- Too many outputs → brittle downstream logic.
+- Missing validation → silent bad data.
+- Reusing one Action for unrelated jobs (“multi‑tool”) → hallucinated behavior.
+- Returning raw upstream payloads → tight coupling to vendor changes.

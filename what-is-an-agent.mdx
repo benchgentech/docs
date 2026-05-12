@@ -1,0 +1,99 @@
+---
+title: "What is an Agent?"
+---
+
+An **Agent** is an autonomous, goal‑driven AI assistant that can understand a request, decide the next best step, run one or more Actions, and return a grounded, useful result. Unlike a single prompt (which just predicts text), an Agent performs a mini workflow: classify intent into a Topic, plan or ask clarifying questions, invoke Actions securely, iterate, validate, and respond.
+
+Mental model: **Message → Topic → Reason / Act Loop → Validate → Response**.
+
+---
+
+## **Core Capabilities**
+
+- Interprets free‑form natural language (not just buttons / rigid menus).
+- Chains tasks: gather data, transform, update, summarize, draft content.
+- Maintains short recent conversation context for coherent follow‑ups.
+- Applies guardrails: scope limits, confirmation steps, identity checks.
+- Improves over time as you refine Topics, Actions, and instructions.
+
+---
+
+## **Building Blocks**
+
+1. **Agent** – Container (persona, collection of Topics, config).
+2. **Topics** – Job definitions: when to engage, boundaries, rules, allowed Actions.
+3. **Actions** – Executable units (API call, function, workflow, data lookup, generation) the Agent can run inside a Topic.
+4. **Reasoning Engine** – Orchestrates classification, tool choice, multi‑step loops.
+5. **LLM** – Language reasoning core used for understanding, decision steps, and drafting responses.
+
+If any piece is vague (especially Topic scope), reliability drops—tighten definitions first instead of adding more features.
+
+---
+
+## **How a Message Flows**
+
+1. **Input** – User (or system trigger) sends a question / command.
+2. **Topic Selection** – Recent turns \+ each Topic’s name & classification description are compared; best fit chosen (or off‑topic fallback if none match).
+3. **Reasoning Loop** (repeat up to a small cap):
+   - Decide: run an Action, ask for missing info, clarify ambiguity, or answer directly.
+   - If an Action runs: execute → map outputs → append to context.
+   - Check if goal satisfied; else iterate.
+4. **Validation** – (Optional) ensure response is in‑scope, grounded, policy‑safe. Regenerate or escalate if it fails.
+5. **Response** – Stream or send the final answer and wait for the next turn.
+
+Lever: precise Topic instructions strongly shape step 3 (what to ask first, which Action to prioritize, when to stop).
+
+---
+
+## **Agents vs Scripted Bots**
+
+| **Aspect** | **Agent** | **Scripted Bot** |
+| :-- | :-- | :-- |
+| Conversation style | Adaptive, free‑form | Predefined flows / branches |
+| Intent handling | Semantic (LLM classification) | Rules, keywords, narrow model |
+| Tool use | Dynamic, multi‑Action plans | Usually fixed single flow |
+| Adaptation | Adjust by refining Topics/Actions | Manual flow editing |
+| Best for | Varied, messy tasks | Deterministic, regulated steps |
+
+Choose a scripted bot when strict, auditable, unchanging flows dominate. Choose an agent when variability, blended context, and multi‑step reasoning matter.
+
+---
+
+## **Common Use Cases**
+
+- Resolve support inquiries end‑to‑end (lookup → policy check → answer).
+- Summarize records (case, ticket, lead) \+ propose next actions.
+- Draft outbound messages (email, notification, follow‑up).
+- Orchestrate data workflows (fetch → validate → update → summarize result).
+- Internal analyst: explain KPIs, highlight anomalies, surface risks.
+
+Start narrow (one high‑value task). Broad first scopes cause misclassification noise.
+
+---
+
+## **New Topic or New Action?**
+
+Create a **new Topic** when: intent category or decision rules differ meaningfully, or a current Topic would need many conditional branches. Create a **new Action** when: same intent category but you need a different external operation / side effect.
+
+Avoid: catch‑all Topics, mega Actions doing unrelated jobs—they reduce transparency & testability.
+
+---
+
+## **Narrative Example**
+
+A "Support Assistant" has Topics: Password Reset, Order Status, Return Eligibility.
+
+**Step-by-step flow:**
+
+1. User: "Where's my package?"
+2. Classifier picks Order Status Topic
+3. Instructions require `order_number` or identifying email fragment
+4. Agent asks if missing information needed
+5. Runs `LookupOrderStatus` Action
+6. Normalizes carrier \+ ETA data
+7. Replies with concise status
+8. Offers follow-up ("Need to place a hold or start a return?")
+
+---
+
+\
