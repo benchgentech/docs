@@ -1,0 +1,33 @@
+---
+title: "Connecting Custom Agents"
+---
+
+# Connecting Custom Agents
+
+Bring your own agents into BenchGen Agentspace.
+
+### Supported Methods
+
+- REST API endpoint
+
+- SDK integration
+
+- VS Code / Cline extension (for coder agents)
+
+- Docker / self-hosted agents
+
+**Example**
+
+\`\`\`python
+
+from benchgen import Agent
+
+my\_agent = Agent(
+
+    name="Custom Researcher",
+
+    endpoint="[https://my-custom-agent.com/api/chat](https://my-custom-agent.com/api/chat)",
+
+    tools=\["web\_search", "calculator"\]
+
+)

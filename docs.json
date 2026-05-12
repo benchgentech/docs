@@ -40,7 +40,11 @@
           {
             "group": "Agentspace",
             "pages": [
-              "welcome-to-agentspace"
+              "welcome-to-agentspace",
+              "agent-concepts",
+              "creating-agents",
+              "agent-to-agent-integration",
+              "connecting-custom-agents"
             ]
           },
           {
